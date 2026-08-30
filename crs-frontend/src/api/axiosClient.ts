@@ -7,4 +7,15 @@ const axiosClient = axios.create({
     },
 });
 
+// Tự động lấy JWT và gửi kèm mỗi request
+axiosClient.interceptors.request.use((config) => {
+    const token = localStorage.getItem('crs_token');
+
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+});
+
 export default axiosClient;

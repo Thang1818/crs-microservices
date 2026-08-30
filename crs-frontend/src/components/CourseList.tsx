@@ -6,6 +6,8 @@ interface CourseListProps {
     state: LoadState;
     errorMessage: string;
     onRetry: () => void;
+    onEdit: (course: Course) => void;
+    onDelete: (course: Course) => void;
 }
 
 export default function CourseList({
@@ -13,51 +15,25 @@ export default function CourseList({
                                        state,
                                        errorMessage,
                                        onRetry,
+                                       onEdit,
+                                       onDelete,
                                    }: CourseListProps) {
-
-    // =========================
-    // LOADING
-    // =========================
-
     if (state === 'loading') {
-        return (
-            <p>
-                Dang tai danh sach mon hoc...
-            </p>
-        );
+        return <p>Dang tai danh sach mon hoc...</p>;
     }
-
-    // =========================
-    // ERROR
-    // =========================
 
     if (state === 'error') {
         return (
             <div style={{ color: '#b91c1c' }}>
                 <p>{errorMessage}</p>
-
-                <button onClick={onRetry}>
-                    Thu lai
-                </button>
+                <button onClick={onRetry}>Thu lai</button>
             </div>
         );
     }
 
-    // =========================
-    // EMPTY
-    // =========================
-
     if (state === 'empty') {
-        return (
-            <p>
-                Khong tim thay mon hoc nao phu hop.
-            </p>
-        );
+        return <p>Khong tim thay mon hoc nao phu hop.</p>;
     }
-
-    // =========================
-    // SUCCESS
-    // =========================
 
     return (
         <table
@@ -70,21 +46,13 @@ export default function CourseList({
             <tr
                 style={{
                     textAlign: 'left',
-                    borderBottom:
-                        '2px solid #333',
+                    borderBottom: '2px solid #333',
                 }}
             >
-                <th>
-                    Ten mon hoc
-                </th>
-
-                <th>
-                    So tin chi
-                </th>
-
-                <th>
-                    So cho con lai
-                </th>
+                <th>Ten mon hoc</th>
+                <th>So tin chi</th>
+                <th>So cho con lai</th>
+                <th>Thao tac</th>
             </tr>
             </thead>
 
@@ -93,17 +61,12 @@ export default function CourseList({
                 <tr
                     key={course.id}
                     style={{
-                        borderBottom:
-                            '1px solid #eee',
+                        borderBottom: '1px solid #eee',
                     }}
                 >
-                    <td>
-                        {course.tenMonHoc}
-                    </td>
+                    <td>{course.tenMonHoc}</td>
 
-                    <td>
-                        {course.soTinChi}
-                    </td>
+                    <td>{course.soTinChi}</td>
 
                     <td
                         style={{
@@ -113,9 +76,23 @@ export default function CourseList({
                                     : 'inherit',
                         }}
                     >
-                        {course.soChoConLai}
-                        {' / '}
-                        {course.soChoToiDa}
+                        {course.soChoConLai} / {course.soChoToiDa}
+                    </td>
+
+                    <td>
+                        <button onClick={() => onEdit(course)}>
+                            Sua
+                        </button>
+
+                        <button
+                            onClick={() => onDelete(course)}
+                            style={{
+                                marginLeft: 8,
+                                color: '#b91c1c',
+                            }}
+                        >
+                            Xoa
+                        </button>
                     </td>
                 </tr>
             ))}
