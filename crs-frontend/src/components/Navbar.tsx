@@ -6,32 +6,51 @@ import {
 import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
+
     const {
         user,
         isAuthenticated,
         logout,
     } = useAuth();
 
-    const navigate = useNavigate();
+    const navigate =
+        useNavigate();
 
     const handleLogout = () => {
+
         logout();
+
         navigate('/login');
     };
 
     return (
         <nav
             style={{
+                padding: 16,
+                borderBottom:
+                    '1px solid #ddd',
                 display: 'flex',
                 gap: 16,
-                padding: 12,
-                borderBottom: '1px solid #ddd',
                 alignItems: 'center',
             }}
         >
+
             <Link to="/courses">
-                Danh sach mon hoc
+                Mon hoc
             </Link>
+
+            {isAuthenticated &&
+                user?.role === 'STUDENT' && (
+                    <>
+                        <Link to="/register-course">
+                            Dang ky hoc phan
+                        </Link>
+
+                        <Link to="/my-registrations">
+                            Mon hoc da dang ky
+                        </Link>
+                    </>
+                )}
 
             {isAuthenticated &&
                 user?.role === 'ADMIN' && (
@@ -40,40 +59,34 @@ export default function Navbar() {
                     </Link>
                 )}
 
-            {isAuthenticated &&
-                user?.role === 'STUDENT' && (
-                    <Link to="/register-course">
-                        Dang ky hoc phan
-                    </Link>
-                )}
-
             <div
                 style={{
                     marginLeft: 'auto',
                 }}
             >
-                {isAuthenticated ? (
-                    <>
-                        <span
-                            style={{
-                                marginRight: 12,
-                            }}
-                        >
-                            Xin chao, {user?.username}{' '}
-                            ({user?.role})
-                        </span>
 
-                        <button
-                            onClick={handleLogout}
-                        >
-                            Dang xuat
-                        </button>
-                    </>
-                ) : (
-                    <Link to="/login">
-                        Dang nhap
-                    </Link>
-                )}
+                {isAuthenticated &&
+                    user && (
+                        <>
+                            <span
+                                style={{
+                                    marginRight: 12,
+                                }}
+                            >
+                                Xin chao, {user.username} (
+                                {user.role})
+                            </span>
+
+                            <button
+                                onClick={
+                                    handleLogout
+                                }
+                            >
+                                Dang xuat
+                            </button>
+                        </>
+                    )}
+
             </div>
         </nav>
     );

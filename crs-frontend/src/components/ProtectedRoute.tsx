@@ -10,12 +10,14 @@ export default function ProtectedRoute({
                                            children,
                                            requiredRole,
                                        }: ProtectedRouteProps) {
+
     const {
         user,
         isAuthenticated,
     } = useAuth();
 
     if (!isAuthenticated) {
+
         return (
             <Navigate
                 to="/login"
@@ -28,6 +30,7 @@ export default function ProtectedRoute({
         requiredRole &&
         user?.role !== requiredRole
     ) {
+
         return (
             <Navigate
                 to="/courses"

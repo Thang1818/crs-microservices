@@ -5,69 +5,87 @@ import {
     Navigate,
 } from 'react-router-dom';
 
-import { AuthProvider } from './context/AuthContext';
-
+import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
 
 import LoginPage from './pages/LoginPage';
 import CoursesPage from './pages/CoursesPage';
 import AdminCoursesPage from './pages/AdminCoursesPage';
 import RegisterCoursePage from './pages/RegisterCoursePage';
+import MyRegistrationsPage from './pages/MyRegistrationsPage';
 
-import Navbar from './components/Navbar';
-
-function App() {
+export default function App() {
     return (
         <BrowserRouter>
-            <AuthProvider>
-                <Navbar />
+            <Navbar />
 
-                <Routes>
-                    <Route
-                        path="/"
-                        element={
-                            <Navigate
-                                to="/courses"
-                                replace
-                            />
-                        }
-                    />
+            <Routes>
 
-                    <Route
-                        path="/login"
-                        element={<LoginPage />}
-                    />
+                {/* Trang đăng nhập */}
+                <Route
+                    path="/login"
+                    element={<LoginPage />}
+                />
 
-                    <Route
-                        path="/courses"
-                        element={<CoursesPage />}
-                    />
+                {/* Danh sách môn học */}
+                <Route
+                    path="/courses"
+                    element={<CoursesPage />}
+                />
 
-                    <Route
-                        path="/admin/courses"
-                        element={
-                            <ProtectedRoute
-                                requiredRole="ADMIN"
-                            >
-                                <AdminCoursesPage />
-                            </ProtectedRoute>
-                        }
-                    />
+                {/* Quản trị môn học - ADMIN */}
+                <Route
+                    path="/admin/courses"
+                    element={
+                        <ProtectedRoute requiredRole="ADMIN">
+                            <AdminCoursesPage />
+                        </ProtectedRoute>
+                    }
+                />
 
-                    <Route
-                        path="/register-course"
-                        element={
-                            <ProtectedRoute
-                                requiredRole="STUDENT"
-                            >
-                                <RegisterCoursePage />
-                            </ProtectedRoute>
-                        }
-                    />
-                </Routes>
-            </AuthProvider>
+                {/* Đăng ký học phần - STUDENT */}
+                <Route
+                    path="/register-course"
+                    element={
+                        <ProtectedRoute requiredRole="STUDENT">
+                            <RegisterCoursePage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* Môn học đã đăng ký - STUDENT */}
+                <Route
+                    path="/my-registrations"
+                    element={
+                        <ProtectedRoute requiredRole="STUDENT">
+                            <MyRegistrationsPage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* Mở localhost:5173/ thì chuyển sang login */}
+                <Route
+                    path="/"
+                    element={
+                        <Navigate
+                            to="/login"
+                            replace
+                        />
+                    }
+                />
+
+                {/* URL không tồn tại cũng chuyển về login */}
+                <Route
+                    path="*"
+                    element={
+                        <Navigate
+                            to="/login"
+                            replace
+                        />
+                    }
+                />
+
+            </Routes>
         </BrowserRouter>
     );
 }
-
-export default App;

@@ -9,6 +9,7 @@ import {
 import type { LoginResponse } from '../types/auth';
 
 interface AuthUser {
+    id: number;
     username: string;
     role: 'ADMIN' | 'STUDENT';
 }
@@ -20,9 +21,10 @@ interface AuthContextValue {
     isAuthenticated: boolean;
 }
 
-const AuthContext = createContext<
-    AuthContextValue | undefined
->(undefined);
+const AuthContext =
+    createContext<AuthContextValue | undefined>(
+        undefined
+    );
 
 const TOKEN_KEY = 'crs_token';
 const USER_KEY = 'crs_user';
@@ -32,10 +34,12 @@ export function AuthProvider({
                              }: {
     children: ReactNode;
 }) {
+
     const [user, setUser] =
         useState<AuthUser | null>(null);
 
     useEffect(() => {
+
         const savedUser =
             localStorage.getItem(USER_KEY);
 
@@ -43,17 +47,38 @@ export function AuthProvider({
             localStorage.getItem(TOKEN_KEY);
 
         if (savedUser && savedToken) {
-            setUser(JSON.parse(savedUser));
+
+            try {
+
+                setUser(
+                    JSON.parse(savedUser)
+                );
+
+            } catch {
+
+                localStorage.removeItem(
+                    USER_KEY
+                );
+
+                localStorage.removeItem(
+                    TOKEN_KEY
+                );
+            }
         }
+
     }, []);
 
-    const login = (data: LoginResponse) => {
+    const login = (
+        data: LoginResponse
+    ) => {
+
         localStorage.setItem(
             TOKEN_KEY,
             data.token
         );
 
         const authUser: AuthUser = {
+            id: data.userId,
             username: data.username,
             role: data.role,
         };
@@ -67,8 +92,15 @@ export function AuthProvider({
     };
 
     const logout = () => {
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(USER_KEY);
+
+        localStorage.removeItem(
+            TOKEN_KEY
+        );
+
+        localStorage.removeItem(
+            USER_KEY
+        );
+
         setUser(null);
     };
 
@@ -87,9 +119,12 @@ export function AuthProvider({
 }
 
 export function useAuth() {
-    const ctx = useContext(AuthContext);
+
+    const ctx =
+        useContext(AuthContext);
 
     if (!ctx) {
+
         throw new Error(
             'useAuth phai duoc dung ben trong AuthProvider'
         );

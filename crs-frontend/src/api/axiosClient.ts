@@ -7,36 +7,48 @@ const axiosClient = axios.create({
     },
 });
 
-// Request Interceptor
-axiosClient.interceptors.request.use((config) => {
-    const token = localStorage.getItem('crs_token');
+axiosClient.interceptors.request.use(
+    (config) => {
 
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
+        const token =
+            localStorage.getItem(
+                'crs_token'
+            );
 
-    return config;
-});
+        if (token) {
 
-// Response Interceptor
-axiosClient.interceptors.response.use(
-    (response) => response,
-    (error) => {
-        if (
-            axios.isAxiosError(error) &&
-            error.response?.status === 401
-        ) {
-            localStorage.removeItem('crs_token');
-            localStorage.removeItem('crs_user');
-
-            if (
-                window.location.pathname !== '/login'
-            ) {
-                window.location.href = '/login';
-            }
+            config.headers.Authorization =
+                `Bearer ${token}`;
         }
 
-        return Promise.reject(error);
+        return config;
+    }
+);
+
+axiosClient.interceptors.response.use(
+    (response) => response,
+
+    (error) => {
+
+        if (
+            error.response?.status === 401
+        ) {
+
+            localStorage.removeItem(
+                'crs_token'
+            );
+
+            localStorage.removeItem(
+                'crs_user'
+            );
+
+            window.location.href =
+                '/login';
+        }
+
+        return Promise.reject(
+            error
+        );
     }
 );
 
