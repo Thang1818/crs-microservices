@@ -8,7 +8,9 @@ import java.util.List;
 public interface RegistrationRepository
         extends JpaRepository<Registration, Long> {
 
-    List<Registration> findByStudentId(Long studentId);
+    List<Registration> findByStudentId(
+            Long studentId
+    );
 
     boolean existsByStudentIdAndCourseIdAndTrangThai(
             Long studentId,

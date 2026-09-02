@@ -20,7 +20,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Component
-public class JwtAuthFilter extends OncePerRequestFilter {
+public class JwtAuthFilter
+        extends OncePerRequestFilter {
 
     @Value("${jwt.secret}")
     private String secret;
@@ -35,63 +36,88 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String authHeader =
                 request.getHeader("Authorization");
 
-        if (authHeader != null &&
-                authHeader.startsWith("Bearer ")) {
+        // Không có token:
+        // để SecurityConfig xử lý quyền truy cập
+        if (authHeader == null ||
+                !authHeader.startsWith("Bearer ")) {
 
-            String token =
-                    authHeader.substring(7);
-
-            try {
-
-                SecretKey key =
-                        Keys.hmacShaKeyFor(
-                                secret.getBytes(
-                                        StandardCharsets.UTF_8
-                                )
-                        );
-
-                Claims claims =
-                        Jwts.parser()
-                                .verifyWith(key)
-                                .build()
-                                .parseSignedClaims(token)
-                                .getPayload();
-
-                String username =
-                        claims.getSubject();
-
-                String role =
-                        claims.get(
-                                "role",
-                                String.class
-                        );
-
-                UsernamePasswordAuthenticationToken
-                        authToken =
-                        new UsernamePasswordAuthenticationToken(
-                                username,
-                                null,
-                                List.of(
-                                        new SimpleGrantedAuthority(
-                                                "ROLE_" + role
-                                        )
-                                )
-                        );
-
-                SecurityContextHolder
-                        .getContext()
-                        .setAuthentication(authToken);
-
-            } catch (Exception e) {
-
-                SecurityContextHolder
-                        .clearContext();
-            }
+            filterChain.doFilter(request, response);
+            return;
         }
 
-        filterChain.doFilter(
-                request,
-                response
-        );
+        String token =
+                authHeader.substring(7);
+
+        try {
+
+            SecretKey key =
+                    Keys.hmacShaKeyFor(
+                            secret.getBytes(
+                                    StandardCharsets.UTF_8
+                            )
+                    );
+
+            Claims claims =
+                    Jwts.parser()
+                            .verifyWith(key)
+                            .build()
+                            .parseSignedClaims(token)
+                            .getPayload();
+
+            String username =
+                    claims.getSubject();
+
+            String role =
+                    claims.get(
+                            "role",
+                            String.class
+                    );
+
+            Long userId =
+                    claims.get(
+                            "userId",
+                            Long.class
+                    );
+
+            UsernamePasswordAuthenticationToken
+                    authToken =
+                    new UsernamePasswordAuthenticationToken(
+                            username,
+                            userId,
+                            List.of(
+                                    new SimpleGrantedAuthority(
+                                            "ROLE_" + role
+                                    )
+                            )
+                    );
+
+            SecurityContextHolder
+                    .getContext()
+                    .setAuthentication(authToken);
+
+            filterChain.doFilter(
+                    request,
+                    response
+            );
+
+        } catch (Exception e) {
+
+            // JWT có nhưng không hợp lệ
+            // => trả 401 ngay lập tức
+            SecurityContextHolder
+                    .clearContext();
+
+            response.setStatus(
+                    HttpServletResponse.SC_UNAUTHORIZED
+            );
+
+            response.setContentType(
+                    "application/json"
+            );
+
+            response.getWriter().write(
+                    "{\"status\":401,\"error\":\"Unauthorized\",\"message\":\"Invalid JWT token\"}"
+            );
+        }
     }
 }

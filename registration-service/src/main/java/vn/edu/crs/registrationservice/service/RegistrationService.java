@@ -8,6 +8,7 @@ import vn.edu.crs.registrationservice.entity.Registration;
 import vn.edu.crs.registrationservice.repository.RegistrationRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -18,6 +19,7 @@ public class RegistrationService {
     private static final String DA_HUY = "DA_HUY";
 
     private final RegistrationRepository registrationRepository;
+
     private final CourseClient courseClient;
 
     public Registration register(
@@ -36,12 +38,10 @@ public class RegistrationService {
             );
         }
 
-        // Gọi course-service để trừ chỗ
         courseClient.reserveSeat(
                 dto.getCourseId()
         );
 
-        // Chỉ lưu khi course-service trừ chỗ thành công
         Registration registration =
                 new Registration();
 
@@ -66,7 +66,9 @@ public class RegistrationService {
         );
     }
 
-    public void cancel(Long registrationId) {
+    public void cancel(
+            Long registrationId
+    ) {
 
         Registration registration =
                 registrationRepository
@@ -87,12 +89,10 @@ public class RegistrationService {
             );
         }
 
-        // Hoàn chỗ
         courseClient.releaseSeat(
                 registration.getCourseId()
         );
 
-        // Đổi trạng thái
         registration.setTrangThai(
                 DA_HUY
         );
@@ -100,5 +100,13 @@ public class RegistrationService {
         registrationRepository.save(
                 registration
         );
+    }
+
+    public List<Registration> getMyRegistrations(
+            Long studentId
+    ) {
+
+        return registrationRepository
+                .findByStudentId(studentId);
     }
 }

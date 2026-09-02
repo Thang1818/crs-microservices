@@ -66,11 +66,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                 String.class
                         );
 
+                Long userId =
+                        claims.get(
+                                "userId",
+                                Long.class
+                        );
+
                 UsernamePasswordAuthenticationToken
                         authToken =
                         new UsernamePasswordAuthenticationToken(
                                 username,
-                                null,
+                                userId,
                                 List.of(
                                         new SimpleGrantedAuthority(
                                                 "ROLE_" + role
