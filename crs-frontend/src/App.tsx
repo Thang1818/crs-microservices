@@ -13,6 +13,7 @@ import CoursesPage from './pages/CoursesPage';
 import AdminCoursesPage from './pages/AdminCoursesPage';
 import RegisterCoursePage from './pages/RegisterCoursePage';
 import MyRegistrationsPage from './pages/MyRegistrationsPage';
+import ApiKeysPage from './pages/ApiKeysPage';
 
 export default function App() {
     return (
@@ -39,6 +40,16 @@ export default function App() {
                     element={
                         <ProtectedRoute requiredRole="ADMIN">
                             <AdminCoursesPage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* Quản lý API Key - ADMIN */}
+                <Route
+                    path="/admin/api-keys"
+                    element={
+                        <ProtectedRoute requiredRole="ADMIN">
+                            <ApiKeysPage />
                         </ProtectedRoute>
                     }
                 />

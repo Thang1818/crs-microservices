@@ -39,6 +39,7 @@ export default function Navbar() {
                 Mon hoc
             </Link>
 
+            {/* MENU STUDENT */}
             {isAuthenticated &&
                 user?.role === 'STUDENT' && (
                     <>
@@ -52,11 +53,18 @@ export default function Navbar() {
                     </>
                 )}
 
+            {/* MENU ADMIN */}
             {isAuthenticated &&
                 user?.role === 'ADMIN' && (
-                    <Link to="/admin/courses">
-                        Quan tri mon hoc
-                    </Link>
+                    <>
+                        <Link to="/admin/courses">
+                            Quan tri mon hoc
+                        </Link>
+
+                        <Link to="/admin/api-keys">
+                            Quan ly API Key
+                        </Link>
+                    </>
                 )}
 
             <div
